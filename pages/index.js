@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const [companyId, setCompanyId] = useState('');
@@ -6,12 +6,6 @@ export default function Home() {
   const [vectorizeResponse, setVectorizeResponse] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState(null);
-  const [isClient, setIsClient] = useState(false); // To check if it's running on the client side
-
-  // Check if we are in the browser (client-side rendering)
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleFileChange = async (e) => {
     const uploadedFile = e.target.files[0];
@@ -27,61 +21,34 @@ export default function Home() {
     formData.append('companyId', companyId);
     formData.append('modelName', 'bge-m3');
 
-    try {
-      const response = await fetch('/api/vectorize', {
-        method: 'POST',
-        body: formData,
-      });
+    const response = await fetch('/api/vectorize', {
+      method: 'POST',
+      body: formData,
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to vectorize file.');
-      }
-
-      const data = await response.json();
-      setVectorizeResponse(data);
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('There was an error uploading the file. Please try again.');
-    }
+    const data = await response.json();
+    setVectorizeResponse(data);
   };
 
   const handleChat = async () => {
-    if (!chatInput) {
-      alert('Please enter a question.');
-      return;
-    }
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        companyId,
+        model: 'llama3.1',
+        chatInput,
+      }),
+    });
 
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          companyId,
-          model: 'llama3.1',
-          chatInput,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get chat response.');
-      }
-
-      const data = await response.json();
-
-      // Extract and clean the 'response' part
-      const cleanedResponse = data.response.replace(/\n/g, '<br>');
-      setChatResponse(cleanedResponse);
-    } catch (error) {
-      console.error('Error during chat:', error);
-      alert('There was an error with your chat request. Please try again.');
-    }
+    const data = await response.json();
+    
+    // Extract and clean the 'response' part
+    const cleanedResponse = data.response.replace(/\n/g, '<br>');
+    setChatResponse(cleanedResponse);
   };
-
-  if (!isClient) {
-    return null; // Avoid rendering on the server side
-  }
 
   return (
     <div style={styles.container}>
@@ -118,6 +85,7 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Show Only the Cleaned Response */}
       {chatResponse && (
         <div
           style={styles.responseBox}
