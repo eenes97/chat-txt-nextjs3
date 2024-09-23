@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const [companyId, setCompanyId] = useState('');
@@ -6,12 +6,6 @@ export default function Home() {
   const [vectorizeResponse, setVectorizeResponse] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState(null);
-  const [isClient, setIsClient] = useState(false); // Added this flag to detect client-side rendering
-
-  // Ensure that the code only runs on the client
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleFileChange = async (e) => {
     const uploadedFile = e.target.files[0];
@@ -70,7 +64,6 @@ export default function Home() {
 
       const data = await response.json();
 
-      // Extract and clean the 'response' part
       const cleanedResponse = data.response.replace(/\n/g, '<br>');
       setChatResponse(cleanedResponse);
     } catch (error) {
@@ -78,11 +71,6 @@ export default function Home() {
       alert('There was an error with your chat request. Please try again.');
     }
   };
-
-  // Prevent rendering any client-dependent logic during SSR
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <div style={styles.container}>
