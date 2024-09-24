@@ -22,9 +22,11 @@ export default async (req, res) => {
         }
       );
 
-      // If the response is not OK (status code 2xx), return an error message
+      // If the response is not OK (status code 2xx), handle errors properly
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => {
+          return { message: 'Unknown error from external API' };
+        });
         return res.status(response.status).json({ message: 'Error from external API', error: errorData });
       }
 
@@ -43,5 +45,3 @@ export default async (req, res) => {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 };
-
-  

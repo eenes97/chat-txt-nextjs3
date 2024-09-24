@@ -20,7 +20,6 @@ export default async (req, res) => {
       }
 
       try {
-        // Extract necessary fields from the form data
         const { companyId, modelName } = fields;
         const file = files.file;
 
@@ -54,6 +53,10 @@ export default async (req, res) => {
         }
 
         const result = await response.json();
+
+        // Clean up the temporary file after uploading it to the external API
+        fs.unlinkSync(filePath); // Delete the temporary file
+
         return res.status(200).json(result);
       } catch (error) {
         console.error('Error uploading file:', error);
@@ -65,4 +68,3 @@ export default async (req, res) => {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 };
-

@@ -6,15 +6,18 @@ export default function Home() {
   const [vectorizeResponse, setVectorizeResponse] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleFileChange = async (e) => {
-    const uploadedFile = e.target.files[0];
+    const uploadedFile = e?.target?.files?.[0]; // Safely access the file
     setFile(uploadedFile);
 
     if (!companyId || !uploadedFile) {
       alert('Please provide company ID and a text file.');
       return;
     }
+
+    setIsLoading(true); // Start loading
 
     const formData = new FormData();
     formData.append('file', uploadedFile);
@@ -36,6 +39,8 @@ export default function Home() {
     } catch (error) {
       console.error('Error uploading file:', error);
       alert('There was an error uploading the file. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -44,6 +49,8 @@ export default function Home() {
       alert('Please enter a question.');
       return;
     }
+
+    setIsLoading(true); // Start loading
 
     try {
       const response = await fetch('/api/chat', {
@@ -63,12 +70,13 @@ export default function Home() {
       }
 
       const data = await response.json();
-
-      const cleanedResponse = data.response.replace(/\n/g, '<br>');
+      const cleanedResponse = data.response.replace(/\n/g, '<br>'); // Handle line breaks
       setChatResponse(cleanedResponse);
     } catch (error) {
       console.error('Error during chat:', error);
       alert('There was an error with your chat request. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -90,8 +98,14 @@ export default function Home() {
 
       {file && <p style={styles.fileName}>{file.name}</p>}
 
-      {vectorizeResponse && (
-        <pre style={styles.responseBox}>{JSON.stringify(vectorizeResponse, null, 2)}</pre>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        vectorizeResponse && (
+          <pre style={styles.responseBox}>
+            {JSON.stringify(vectorizeResponse, null, 2)}
+          </pre>
+        )
       )}
 
       <div style={styles.formGroup}>
@@ -102,8 +116,8 @@ export default function Home() {
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
         />
-        <button style={styles.button} onClick={handleChat}>
-          Ask
+        <button style={styles.button} onClick={handleChat} disabled={isLoading}>
+          {isLoading ? 'Processing...' : 'Ask'}
         </button>
       </div>
 
