@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 
-export default function Home() {
+const Home = () => {
   const [companyId, setCompanyId] = useState('');
   const [file, setFile] = useState(null);
   const [vectorizeResponse, setVectorizeResponse] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const [chatResponse, setChatResponse] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = async (e) => {
     const uploadedFile = e?.target?.files?.[0]; // Safely access the file
@@ -129,7 +130,10 @@ export default function Home() {
       )}
     </div>
   );
-}
+};
+
+// Dynamically import the Home component with SSR disabled
+export default dynamic(() => Promise.resolve(Home), { ssr: false });
 
 const styles = {
   container: {
