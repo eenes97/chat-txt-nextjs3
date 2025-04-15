@@ -34,7 +34,7 @@ export default async (req, res) => {
         formData.append('file', fs.createReadStream(filePath)); // Attach the file stream to formData
 
         // Fetch the external API URL from environment variables, fallback to default if undefined
-        const apiUrl = process.env.EXTERNAL_API_URL || 'http://3.85.208.131';
+        const apiUrl = process.env.EXTERNAL_API_URL || 'Fast APInizin http adresini koymaniz gereken yer';
 
         // Make the request to the external API
         const response = await fetch(`${apiUrl}/vectorize/${companyId}?model_name=${modelName}`, {
