@@ -9,7 +9,7 @@ export default async (req, res) => {
 
     try {
       // Define the external API URL using an environment variable
-      const apiUrl = process.env.EXTERNAL_API_URL || 'http://3.85.208.131';
+      const apiUrl = process.env.EXTERNAL_API_URL || 'Fast APInizin http adresini koymaniz gereken yer';
 
       // Make the request to the external API with chat_input as a query parameter
       const response = await fetch(
